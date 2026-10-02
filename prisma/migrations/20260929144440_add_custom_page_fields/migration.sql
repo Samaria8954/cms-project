@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Page" ADD COLUMN     "customCss" TEXT NOT NULL DEFAULT '',
+ADD COLUMN     "customHtml" TEXT NOT NULL DEFAULT '',
+ADD COLUMN     "customJs" TEXT NOT NULL DEFAULT '';
