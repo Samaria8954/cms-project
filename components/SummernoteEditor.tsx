@@ -1,11 +1,64 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-
 import $ from "jquery";
 
 import "summernote/dist/summernote-lite.css";
 import "summernote/dist/summernote-lite.js";
+
+
+
+interface SummernoteJQuery
+  extends JQuery<HTMLElement> {
+  summernote(
+    options: object
+  ): SummernoteJQuery;
+
+  summernote(
+    command: "code"
+  ): string;
+
+  summernote(
+    command: "code",
+    value: string
+  ): SummernoteJQuery;
+
+  summernote(
+    command: "disable" | "enable" | "destroy"
+  ): SummernoteJQuery;
+
+  summernote(
+    command: string,
+    ...args: unknown[]
+  ): SummernoteJQuery;
+}
+
+type SummernoteStatic = typeof $ & {
+  summernote: {
+    ui: {
+      button(options: {
+        contents?: string;
+        tooltip?: string;
+        click?: () => void;
+      }): {
+        render(): JQuery<HTMLElement>;
+      };
+    };
+  };
+};
+
+/*
+ * jQuery callable helper
+ */
+const jq = $ as unknown as (
+  element: HTMLElement
+) => SummernoteJQuery;
+
+/*
+ * Summernote static API
+ */
+const summernote$ =
+  $ as unknown as SummernoteStatic;
 
 type SummernoteEditorProps = {
   value: string;
@@ -20,12 +73,20 @@ export default function SummernoteEditor({
   disabled = false,
   onCustomCodeClick,
 }: SummernoteEditorProps) {
-  const editorRef = useRef<HTMLDivElement | null>(null);
-  const initializedRef = useRef(false);
+  const editorRef =
+    useRef<HTMLDivElement | null>(null);
 
-  const lastValueRef = useRef(value || "");
-  const onChangeRef = useRef(onChange);
-  const customCodeClickRef = useRef(onCustomCodeClick);
+  const initializedRef =
+    useRef(false);
+
+  const lastValueRef =
+    useRef(value || "");
+
+  const onChangeRef =
+    useRef(onChange);
+
+  const customCodeClickRef =
+    useRef(onCustomCodeClick);
 
   /* -----------------------------------------
      Keep latest callbacks
@@ -36,7 +97,8 @@ export default function SummernoteEditor({
   }, [onChange]);
 
   useEffect(() => {
-    customCodeClickRef.current = onCustomCodeClick;
+    customCodeClickRef.current =
+      onCustomCodeClick;
   }, [onCustomCodeClick]);
 
   /* -----------------------------------------
@@ -46,38 +108,43 @@ export default function SummernoteEditor({
   useEffect(() => {
     if (!editorRef.current) return;
 
-    const $editor = $(editorRef.current);
+    const $editor =
+      jq(editorRef.current);
 
     if (initializedRef.current) return;
 
     initializedRef.current = true;
 
-    const customCodeButton = function (context: any) {
-      const ui = $.summernote.ui;
+    const customCodeButton =
+      function () {
+        const ui =
+          summernote$.summernote.ui;
 
-      return ui
-        .button({
-          contents:
-            '<span style="font-size:13px;font-weight:700;">&lt;/&gt;</span>',
-          tooltip: "Add Custom Code Section",
-          click: function () {
-            customCodeClickRef.current?.();
-          },
-        })
-        .render();
-    };
+        return ui
+          .button({
+            contents:
+              '<span style="font-size:13px;font-weight:700;">&lt;/&gt;</span>',
+
+            tooltip:
+              "Add Custom Code Section",
+
+            click: function () {
+              customCodeClickRef.current?.();
+            },
+          })
+          .render();
+      };
 
     try {
       $editor.summernote({
-        /*
-         * Small initial editor.
-         * User can stretch it vertically.
-         */
         height: 210,
+
         minHeight: 160,
+
         maxHeight: 900,
 
-        placeholder: "Start writing your page content...",
+        placeholder:
+          "Start writing your page content...",
 
         dialogsInBody: true,
 
@@ -151,32 +218,41 @@ export default function SummernoteEditor({
               "codeview",
             ],
           ],
-
-          
         ],
 
         buttons: {
-          customCode: customCodeButton,
+          customCode:
+            customCodeButton,
         },
 
         callbacks: {
           onInit: function () {
             try {
-              const button = $editor
-                .next(".note-editor")
-                .find(
-                  '.note-btn[data-name="customCode"]'
-                );
+              const button =
+                $editor
+                  .next(".note-editor")
+                  .find(
+                    '.note-btn[data-name="customCode"]'
+                  );
 
               button.css({
-                background: "#eff6ff",
-                border: "1px solid #bfdbfe",
-                color: "#2563eb",
-                fontWeight: "700",
+                background:
+                  "#eff6ff",
+
+                border:
+                  "1px solid #bfdbfe",
+
+                color:
+                  "#2563eb",
+
+                fontWeight:
+                  "700",
               });
 
               if (disabled) {
-                $editor.summernote("disable");
+                $editor.summernote(
+                  "disable"
+                );
               }
             } catch (error) {
               console.error(
@@ -189,9 +265,11 @@ export default function SummernoteEditor({
           onChange: function (
             contents: string
           ) {
-            const newValue = contents || "";
+            const newValue =
+              contents || "";
 
-            lastValueRef.current = newValue;
+            lastValueRef.current =
+              newValue;
 
             onChangeRef.current(
               newValue
@@ -201,8 +279,9 @@ export default function SummernoteEditor({
           onBlur: function () {
             try {
               const current =
-                $editor.summernote("code") ||
-                "";
+                $editor.summernote(
+                  "code"
+                ) || "";
 
               lastValueRef.current =
                 current;
@@ -236,7 +315,8 @@ export default function SummernoteEditor({
         error
       );
 
-      initializedRef.current = false;
+      initializedRef.current =
+        false;
     }
 
     /*
@@ -248,7 +328,12 @@ export default function SummernoteEditor({
           editorRef.current &&
           initializedRef.current
         ) {
-          $editor.summernote(
+          const cleanupEditor =
+            jq(
+              editorRef.current
+            );
+
+          cleanupEditor.summernote(
             "destroy"
           );
         }
@@ -277,19 +362,17 @@ export default function SummernoteEditor({
     }
 
     const $editor =
-      $(editorRef.current);
+      jq(editorRef.current);
 
     try {
       const current =
-        $editor.summernote("code") ||
-        "";
+        $editor.summernote(
+          "code"
+        ) || "";
 
       const externalValue =
         value || "";
 
-      /*
-       * Don't overwrite user's typing.
-       */
       if (
         externalValue !== current &&
         externalValue !==
@@ -324,7 +407,7 @@ export default function SummernoteEditor({
     }
 
     const $editor =
-      $(editorRef.current);
+      jq(editorRef.current);
 
     try {
       if (disabled) {
@@ -437,9 +520,6 @@ export default function SummernoteEditor({
 
         /* =================================
            EDITING AREA
-
-           SMALL INITIALLY
-           USER CAN DRAG DOWN
         ================================= */
 
         .summernote-wrapper

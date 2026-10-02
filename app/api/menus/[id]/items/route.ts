@@ -13,13 +13,12 @@ const prisma = new PrismaClient({
 type RouteContext = {
   params: Promise<{
     id: string;
-    itemId: string;
   }>;
 };
 
 // =====================================================
-// GET SINGLE MENU ITEM
-// GET /api/menus/:menuId/items/:itemId
+// GET MENU ITEMS
+// GET /api/menus/:menuId/items
 // =====================================================
 
 export async function GET(
@@ -27,76 +26,73 @@ export async function GET(
   { params }: RouteContext
 ) {
   try {
-    const { id, itemId } = await params;
+    const { id } = await params;
 
     const menuId = Number(id);
-    const menuItemId = Number(itemId);
 
-    if (
-      !Number.isInteger(menuId) ||
-      menuId <= 0 ||
-      !Number.isInteger(menuItemId) ||
-      menuItemId <= 0
-    ) {
+    if (!Number.isInteger(menuId) || menuId <= 0) {
       return NextResponse.json(
-        { error: "Invalid menu or menu item ID." },
+        { error: "Invalid menu ID." },
         { status: 400 }
       );
     }
 
-    const item = await prisma.menuItem.findFirst({
+    const items = await prisma.menuItem.findMany({
       where: {
-        id: menuItemId,
         menuId: menuId,
       },
       include: {
         page: true,
         children: true,
       },
+      orderBy: {
+        sortOrder: "asc",
+      },
     });
 
-    if (!item) {
-      return NextResponse.json(
-        { error: "Menu item not found." },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json(item);
+    return NextResponse.json(items);
   } catch (error) {
-    console.error("GET MENU ITEM ERROR:", error);
+    console.error("GET MENU ITEMS ERROR:", error);
 
     return NextResponse.json(
-      { error: "Failed to fetch menu item." },
+      { error: "Failed to fetch menu items." },
       { status: 500 }
     );
   }
 }
 
 // =====================================================
-// UPDATE MENU ITEM
-// PUT /api/menus/:menuId/items/:itemId
+// CREATE MENU ITEM
+// POST /api/menus/:menuId/items
 // =====================================================
 
-export async function PUT(
+export async function POST(
   request: Request,
   { params }: RouteContext
 ) {
   try {
-    const { id, itemId } = await params;
+    const { id } = await params;
 
     const menuId = Number(id);
-    const menuItemId = Number(itemId);
 
-    if (
-      !Number.isInteger(menuId) ||
-      menuId <= 0 ||
-      !Number.isInteger(menuItemId) ||
-      menuItemId <= 0
-    ) {
+    if (!Number.isInteger(menuId) || menuId <= 0) {
       return NextResponse.json(
-        { error: "Invalid menu or menu item ID." },
+        { error: "Invalid menu ID." },
         { status: 400 }
+      );
+    }
+
+    // Check menu exists
+    const menu = await prisma.menu.findUnique({
+      where: {
+        id: menuId,
+      },
+    });
+
+    if (!menu) {
+      return NextResponse.json(
+        { error: "Menu not found." },
+        { status: 404 }
       );
     }
 
@@ -112,44 +108,26 @@ export async function PUT(
       megaMenu,
     } = body;
 
-    // Find existing item
-    const existingItem = await prisma.menuItem.findFirst({
-      where: {
-        id: menuItemId,
-        menuId: menuId,
-      },
-    });
-
-    if (!existingItem) {
-      return NextResponse.json(
-        { error: "Menu item not found." },
-        { status: 404 }
-      );
-    }
-
     // Validate title
-    if (
-      title !== undefined &&
-      (!title || !String(title).trim())
-    ) {
+    if (!title || !String(title).trim()) {
       return NextResponse.json(
         { error: "Menu item title is required." },
         { status: 400 }
       );
     }
 
-    // Page ID
-    const validPageId =
-      pageId !== undefined
-        ? pageId
-          ? Number(pageId)
-          : null
-        : existingItem.pageId;
+    // =================================================
+    // PAGE VALIDATION
+    // =================================================
 
-    if (validPageId !== null) {
+    let validPageId: number | null = null;
+
+    if (pageId !== undefined && pageId !== null && pageId !== "") {
+      const parsedPageId = Number(pageId);
+
       if (
-        !Number.isInteger(validPageId) ||
-        validPageId <= 0
+        !Number.isInteger(parsedPageId) ||
+        parsedPageId <= 0
       ) {
         return NextResponse.json(
           { error: "Invalid page ID." },
@@ -159,30 +137,36 @@ export async function PUT(
 
       const page = await prisma.page.findUnique({
         where: {
-          id: validPageId,
+          id: parsedPageId,
         },
       });
 
       if (!page) {
         return NextResponse.json(
-          { error: "Selected page not found." },
+          { error: "Selected page does not exist." },
           { status: 404 }
         );
       }
+
+      validPageId = parsedPageId;
     }
 
-    // Parent ID
-    const validParentId =
-      parentId !== undefined
-        ? parentId
-          ? Number(parentId)
-          : null
-        : existingItem.parentId;
+    // =================================================
+    // PARENT VALIDATION
+    // =================================================
 
-    if (validParentId !== null) {
+    let validParentId: number | null = null;
+
+    if (
+      parentId !== undefined &&
+      parentId !== null &&
+      parentId !== ""
+    ) {
+      const parsedParentId = Number(parentId);
+
       if (
-        !Number.isInteger(validParentId) ||
-        validParentId <= 0
+        !Number.isInteger(parsedParentId) ||
+        parsedParentId <= 0
       ) {
         return NextResponse.json(
           { error: "Invalid parent menu item ID." },
@@ -190,52 +174,45 @@ export async function PUT(
         );
       }
 
-      // Item cannot be its own parent
-      if (validParentId === menuItemId) {
-        return NextResponse.json(
-          {
-            error: "A menu item cannot be its own parent.",
-          },
-          { status: 400 }
-        );
-      }
-
-      // Parent must belong to same menu
-      const parent = await prisma.menuItem.findFirst({
+      const parent = await prisma.menuItem.findUnique({
         where: {
-          id: validParentId,
-          menuId: menuId,
+          id: parsedParentId,
         },
       });
 
       if (!parent) {
         return NextResponse.json(
-          {
-            error: "Parent menu item not found in this menu.",
-          },
+          { error: "Parent menu item not found." },
           { status: 404 }
         );
       }
+
+      if (parent.menuId !== menuId) {
+        return NextResponse.json(
+          {
+            error: "Parent must belong to the same menu.",
+          },
+          { status: 400 }
+        );
+      }
+
+      validParentId = parsedParentId;
     }
 
-    // Update item
-    const updatedItem = await prisma.menuItem.update({
-      where: {
-        id: menuItemId,
-      },
+    // =================================================
+    // CREATE
+    // =================================================
 
+    const createdItem = await prisma.menuItem.create({
       data: {
-        title:
-          title !== undefined
-            ? String(title).trim()
-            : existingItem.title,
+        menuId: menuId,
+
+        title: String(title).trim(),
 
         url:
-          url !== undefined
-            ? url
-              ? String(url).trim()
-              : null
-            : existingItem.url,
+          url !== undefined && url !== null && url !== ""
+            ? String(url).trim()
+            : null,
 
         pageId: validPageId,
 
@@ -244,17 +221,17 @@ export async function PUT(
         sortOrder:
           sortOrder !== undefined
             ? Number(sortOrder) || 0
-            : existingItem.sortOrder,
+            : 0,
 
         status:
           status !== undefined
             ? String(status)
-            : existingItem.status,
+            : "published",
 
         megaMenu:
           megaMenu !== undefined
             ? Boolean(megaMenu)
-            : existingItem.megaMenu,
+            : false,
       },
 
       include: {
@@ -263,117 +240,19 @@ export async function PUT(
       },
     });
 
-    return NextResponse.json({
-      success: true,
-      message: "Menu item updated successfully.",
-      item: updatedItem,
-    });
-  } catch (error) {
-    console.error("UPDATE MENU ITEM ERROR:", error);
-
     return NextResponse.json(
-      { error: "Failed to update menu item." },
-      { status: 500 }
-    );
-  }
-}
-
-// =====================================================
-// DELETE MENU ITEM
-// DELETE /api/menus/:menuId/items/:itemId
-// =====================================================
-
-export async function DELETE(
-  request: Request,
-  { params }: RouteContext
-) {
-  try {
-    const { id, itemId } = await params;
-
-    const menuId = Number(id);
-    const menuItemId = Number(itemId);
-
-    if (
-      !Number.isInteger(menuId) ||
-      menuId <= 0 ||
-      !Number.isInteger(menuItemId) ||
-      menuItemId <= 0
-    ) {
-      return NextResponse.json(
-        { error: "Invalid menu or menu item ID." },
-        { status: 400 }
-      );
-    }
-
-    // Find item
-    const item = await prisma.menuItem.findFirst({
-      where: {
-        id: menuItemId,
-        menuId: menuId,
+      {
+        success: true,
+        message: "Menu item created successfully.",
+        item: createdItem,
       },
-    });
-
-    if (!item) {
-      return NextResponse.json(
-        { error: "Menu item not found." },
-        { status: 404 }
-      );
-    }
-
-    // Find all children recursively
-    const idsToDelete: number[] = [menuItemId];
-
-    let parentIds: number[] = [menuItemId];
-
-    while (parentIds.length > 0) {
-      const children = await prisma.menuItem.findMany({
-        where: {
-          menuId: menuId,
-          parentId: {
-            in: parentIds,
-          },
-        },
-        select: {
-          id: true,
-        },
-      });
-
-      if (children.length === 0) {
-        break;
-      }
-
-      const childIds = children.map(
-        (child) => child.id
-      );
-
-      idsToDelete.push(...childIds);
-
-      parentIds = childIds;
-    }
-
-    // Delete item + all children
-    await prisma.$transaction(async (tx) => {
-      await tx.menuItem.deleteMany({
-        where: {
-          id: {
-            in: idsToDelete,
-          },
-          menuId: menuId,
-        },
-      });
-    });
-
-    return NextResponse.json({
-      success: true,
-      message: "Menu item deleted successfully.",
-      deletedId: menuItemId,
-      deletedCount: idsToDelete.length,
-    });
+      { status: 201 }
+    );
   } catch (error) {
-    console.error("DELETE MENU ITEM ERROR:", error);
+    console.error("CREATE MENU ITEM ERROR:", error);
 
     return NextResponse.json(
-      { error: "Failed to delete menu item." },
+      { error: "Failed to create menu item." },
       { status: 500 }
     );
   }

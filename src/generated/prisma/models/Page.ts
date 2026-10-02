@@ -37,61 +37,61 @@ export type PageSumAggregateOutputType = {
 export type PageMinAggregateOutputType = {
   id: number | null
   title: string | null
-  menuLabel: string | null
   slug: string | null
   status: string | null
-  content: string | null
-  contentBlocks: string | null
-  customHtml: string | null
-  customCss: string | null
-  customJs: string | null
-  seoTitle: string | null
-  metaDescription: string | null
-  focusKeyword: string | null
-  secondaryKeywords: string | null
-  featuredImage: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  content: string | null
+  featuredImage: string | null
+  customCss: string | null
+  customHtml: string | null
+  customJs: string | null
+  focusKeyword: string | null
+  metaDescription: string | null
+  secondaryKeywords: string | null
+  seoTitle: string | null
+  menuLabel: string | null
+  contentBlocks: string | null
 }
 
 export type PageMaxAggregateOutputType = {
   id: number | null
   title: string | null
-  menuLabel: string | null
   slug: string | null
   status: string | null
-  content: string | null
-  contentBlocks: string | null
-  customHtml: string | null
-  customCss: string | null
-  customJs: string | null
-  seoTitle: string | null
-  metaDescription: string | null
-  focusKeyword: string | null
-  secondaryKeywords: string | null
-  featuredImage: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  content: string | null
+  featuredImage: string | null
+  customCss: string | null
+  customHtml: string | null
+  customJs: string | null
+  focusKeyword: string | null
+  metaDescription: string | null
+  secondaryKeywords: string | null
+  seoTitle: string | null
+  menuLabel: string | null
+  contentBlocks: string | null
 }
 
 export type PageCountAggregateOutputType = {
   id: number
   title: number
-  menuLabel: number
   slug: number
   status: number
-  content: number
-  contentBlocks: number
-  customHtml: number
-  customCss: number
-  customJs: number
-  seoTitle: number
-  metaDescription: number
-  focusKeyword: number
-  secondaryKeywords: number
-  featuredImage: number
   createdAt: number
   updatedAt: number
+  content: number
+  featuredImage: number
+  customCss: number
+  customHtml: number
+  customJs: number
+  focusKeyword: number
+  metaDescription: number
+  secondaryKeywords: number
+  seoTitle: number
+  menuLabel: number
+  contentBlocks: number
   _all: number
 }
 
@@ -107,61 +107,61 @@ export type PageSumAggregateInputType = {
 export type PageMinAggregateInputType = {
   id?: true
   title?: true
-  menuLabel?: true
   slug?: true
   status?: true
-  content?: true
-  contentBlocks?: true
-  customHtml?: true
-  customCss?: true
-  customJs?: true
-  seoTitle?: true
-  metaDescription?: true
-  focusKeyword?: true
-  secondaryKeywords?: true
-  featuredImage?: true
   createdAt?: true
   updatedAt?: true
+  content?: true
+  featuredImage?: true
+  customCss?: true
+  customHtml?: true
+  customJs?: true
+  focusKeyword?: true
+  metaDescription?: true
+  secondaryKeywords?: true
+  seoTitle?: true
+  menuLabel?: true
+  contentBlocks?: true
 }
 
 export type PageMaxAggregateInputType = {
   id?: true
   title?: true
-  menuLabel?: true
   slug?: true
   status?: true
-  content?: true
-  contentBlocks?: true
-  customHtml?: true
-  customCss?: true
-  customJs?: true
-  seoTitle?: true
-  metaDescription?: true
-  focusKeyword?: true
-  secondaryKeywords?: true
-  featuredImage?: true
   createdAt?: true
   updatedAt?: true
+  content?: true
+  featuredImage?: true
+  customCss?: true
+  customHtml?: true
+  customJs?: true
+  focusKeyword?: true
+  metaDescription?: true
+  secondaryKeywords?: true
+  seoTitle?: true
+  menuLabel?: true
+  contentBlocks?: true
 }
 
 export type PageCountAggregateInputType = {
   id?: true
   title?: true
-  menuLabel?: true
   slug?: true
   status?: true
-  content?: true
-  contentBlocks?: true
-  customHtml?: true
-  customCss?: true
-  customJs?: true
-  seoTitle?: true
-  metaDescription?: true
-  focusKeyword?: true
-  secondaryKeywords?: true
-  featuredImage?: true
   createdAt?: true
   updatedAt?: true
+  content?: true
+  featuredImage?: true
+  customCss?: true
+  customHtml?: true
+  customJs?: true
+  focusKeyword?: true
+  metaDescription?: true
+  secondaryKeywords?: true
+  seoTitle?: true
+  menuLabel?: true
+  contentBlocks?: true
   _all?: true
 }
 
@@ -254,21 +254,21 @@ export type PageGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type PageGroupByOutputType = {
   id: number
   title: string
-  menuLabel: string | null
   slug: string
   status: string
-  content: string
-  contentBlocks: string
-  customHtml: string
-  customCss: string
-  customJs: string
-  seoTitle: string | null
-  metaDescription: string | null
-  focusKeyword: string | null
-  secondaryKeywords: string | null
-  featuredImage: string | null
   createdAt: Date
   updatedAt: Date
+  content: string
+  featuredImage: string | null
+  customCss: string
+  customHtml: string
+  customJs: string
+  focusKeyword: string | null
+  metaDescription: string | null
+  secondaryKeywords: string | null
+  seoTitle: string | null
+  menuLabel: string | null
+  contentBlocks: string
   _count: PageCountAggregateOutputType | null
   _avg: PageAvgAggregateOutputType | null
   _sum: PageSumAggregateOutputType | null
@@ -297,42 +297,42 @@ export type PageWhereInput = {
   NOT?: Prisma.PageWhereInput | Prisma.PageWhereInput[]
   id?: Prisma.IntFilter<"Page"> | number
   title?: Prisma.StringFilter<"Page"> | string
-  menuLabel?: Prisma.StringNullableFilter<"Page"> | string | null
   slug?: Prisma.StringFilter<"Page"> | string
   status?: Prisma.StringFilter<"Page"> | string
-  content?: Prisma.StringFilter<"Page"> | string
-  contentBlocks?: Prisma.StringFilter<"Page"> | string
-  customHtml?: Prisma.StringFilter<"Page"> | string
-  customCss?: Prisma.StringFilter<"Page"> | string
-  customJs?: Prisma.StringFilter<"Page"> | string
-  seoTitle?: Prisma.StringNullableFilter<"Page"> | string | null
-  metaDescription?: Prisma.StringNullableFilter<"Page"> | string | null
-  focusKeyword?: Prisma.StringNullableFilter<"Page"> | string | null
-  secondaryKeywords?: Prisma.StringNullableFilter<"Page"> | string | null
-  featuredImage?: Prisma.StringNullableFilter<"Page"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Page"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Page"> | Date | string
+  content?: Prisma.StringFilter<"Page"> | string
+  featuredImage?: Prisma.StringNullableFilter<"Page"> | string | null
+  customCss?: Prisma.StringFilter<"Page"> | string
+  customHtml?: Prisma.StringFilter<"Page"> | string
+  customJs?: Prisma.StringFilter<"Page"> | string
+  focusKeyword?: Prisma.StringNullableFilter<"Page"> | string | null
+  metaDescription?: Prisma.StringNullableFilter<"Page"> | string | null
+  secondaryKeywords?: Prisma.StringNullableFilter<"Page"> | string | null
+  seoTitle?: Prisma.StringNullableFilter<"Page"> | string | null
+  menuLabel?: Prisma.StringNullableFilter<"Page"> | string | null
+  contentBlocks?: Prisma.StringFilter<"Page"> | string
   menuItems?: Prisma.MenuItemListRelationFilter
 }
 
 export type PageOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
-  menuLabel?: Prisma.SortOrderInput | Prisma.SortOrder
   slug?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  content?: Prisma.SortOrder
-  contentBlocks?: Prisma.SortOrder
-  customHtml?: Prisma.SortOrder
-  customCss?: Prisma.SortOrder
-  customJs?: Prisma.SortOrder
-  seoTitle?: Prisma.SortOrderInput | Prisma.SortOrder
-  metaDescription?: Prisma.SortOrderInput | Prisma.SortOrder
-  focusKeyword?: Prisma.SortOrderInput | Prisma.SortOrder
-  secondaryKeywords?: Prisma.SortOrderInput | Prisma.SortOrder
-  featuredImage?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  content?: Prisma.SortOrder
+  featuredImage?: Prisma.SortOrderInput | Prisma.SortOrder
+  customCss?: Prisma.SortOrder
+  customHtml?: Prisma.SortOrder
+  customJs?: Prisma.SortOrder
+  focusKeyword?: Prisma.SortOrderInput | Prisma.SortOrder
+  metaDescription?: Prisma.SortOrderInput | Prisma.SortOrder
+  secondaryKeywords?: Prisma.SortOrderInput | Prisma.SortOrder
+  seoTitle?: Prisma.SortOrderInput | Prisma.SortOrder
+  menuLabel?: Prisma.SortOrderInput | Prisma.SortOrder
+  contentBlocks?: Prisma.SortOrder
   menuItems?: Prisma.MenuItemOrderByRelationAggregateInput
 }
 
@@ -343,41 +343,41 @@ export type PageWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.PageWhereInput[]
   NOT?: Prisma.PageWhereInput | Prisma.PageWhereInput[]
   title?: Prisma.StringFilter<"Page"> | string
-  menuLabel?: Prisma.StringNullableFilter<"Page"> | string | null
   status?: Prisma.StringFilter<"Page"> | string
-  content?: Prisma.StringFilter<"Page"> | string
-  contentBlocks?: Prisma.StringFilter<"Page"> | string
-  customHtml?: Prisma.StringFilter<"Page"> | string
-  customCss?: Prisma.StringFilter<"Page"> | string
-  customJs?: Prisma.StringFilter<"Page"> | string
-  seoTitle?: Prisma.StringNullableFilter<"Page"> | string | null
-  metaDescription?: Prisma.StringNullableFilter<"Page"> | string | null
-  focusKeyword?: Prisma.StringNullableFilter<"Page"> | string | null
-  secondaryKeywords?: Prisma.StringNullableFilter<"Page"> | string | null
-  featuredImage?: Prisma.StringNullableFilter<"Page"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Page"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Page"> | Date | string
+  content?: Prisma.StringFilter<"Page"> | string
+  featuredImage?: Prisma.StringNullableFilter<"Page"> | string | null
+  customCss?: Prisma.StringFilter<"Page"> | string
+  customHtml?: Prisma.StringFilter<"Page"> | string
+  customJs?: Prisma.StringFilter<"Page"> | string
+  focusKeyword?: Prisma.StringNullableFilter<"Page"> | string | null
+  metaDescription?: Prisma.StringNullableFilter<"Page"> | string | null
+  secondaryKeywords?: Prisma.StringNullableFilter<"Page"> | string | null
+  seoTitle?: Prisma.StringNullableFilter<"Page"> | string | null
+  menuLabel?: Prisma.StringNullableFilter<"Page"> | string | null
+  contentBlocks?: Prisma.StringFilter<"Page"> | string
   menuItems?: Prisma.MenuItemListRelationFilter
 }, "id" | "slug">
 
 export type PageOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
-  menuLabel?: Prisma.SortOrderInput | Prisma.SortOrder
   slug?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  content?: Prisma.SortOrder
-  contentBlocks?: Prisma.SortOrder
-  customHtml?: Prisma.SortOrder
-  customCss?: Prisma.SortOrder
-  customJs?: Prisma.SortOrder
-  seoTitle?: Prisma.SortOrderInput | Prisma.SortOrder
-  metaDescription?: Prisma.SortOrderInput | Prisma.SortOrder
-  focusKeyword?: Prisma.SortOrderInput | Prisma.SortOrder
-  secondaryKeywords?: Prisma.SortOrderInput | Prisma.SortOrder
-  featuredImage?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  content?: Prisma.SortOrder
+  featuredImage?: Prisma.SortOrderInput | Prisma.SortOrder
+  customCss?: Prisma.SortOrder
+  customHtml?: Prisma.SortOrder
+  customJs?: Prisma.SortOrder
+  focusKeyword?: Prisma.SortOrderInput | Prisma.SortOrder
+  metaDescription?: Prisma.SortOrderInput | Prisma.SortOrder
+  secondaryKeywords?: Prisma.SortOrderInput | Prisma.SortOrder
+  seoTitle?: Prisma.SortOrderInput | Prisma.SortOrder
+  menuLabel?: Prisma.SortOrderInput | Prisma.SortOrder
+  contentBlocks?: Prisma.SortOrder
   _count?: Prisma.PageCountOrderByAggregateInput
   _avg?: Prisma.PageAvgOrderByAggregateInput
   _max?: Prisma.PageMaxOrderByAggregateInput
@@ -391,182 +391,182 @@ export type PageScalarWhereWithAggregatesInput = {
   NOT?: Prisma.PageScalarWhereWithAggregatesInput | Prisma.PageScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"Page"> | number
   title?: Prisma.StringWithAggregatesFilter<"Page"> | string
-  menuLabel?: Prisma.StringNullableWithAggregatesFilter<"Page"> | string | null
   slug?: Prisma.StringWithAggregatesFilter<"Page"> | string
   status?: Prisma.StringWithAggregatesFilter<"Page"> | string
-  content?: Prisma.StringWithAggregatesFilter<"Page"> | string
-  contentBlocks?: Prisma.StringWithAggregatesFilter<"Page"> | string
-  customHtml?: Prisma.StringWithAggregatesFilter<"Page"> | string
-  customCss?: Prisma.StringWithAggregatesFilter<"Page"> | string
-  customJs?: Prisma.StringWithAggregatesFilter<"Page"> | string
-  seoTitle?: Prisma.StringNullableWithAggregatesFilter<"Page"> | string | null
-  metaDescription?: Prisma.StringNullableWithAggregatesFilter<"Page"> | string | null
-  focusKeyword?: Prisma.StringNullableWithAggregatesFilter<"Page"> | string | null
-  secondaryKeywords?: Prisma.StringNullableWithAggregatesFilter<"Page"> | string | null
-  featuredImage?: Prisma.StringNullableWithAggregatesFilter<"Page"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Page"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Page"> | Date | string
+  content?: Prisma.StringWithAggregatesFilter<"Page"> | string
+  featuredImage?: Prisma.StringNullableWithAggregatesFilter<"Page"> | string | null
+  customCss?: Prisma.StringWithAggregatesFilter<"Page"> | string
+  customHtml?: Prisma.StringWithAggregatesFilter<"Page"> | string
+  customJs?: Prisma.StringWithAggregatesFilter<"Page"> | string
+  focusKeyword?: Prisma.StringNullableWithAggregatesFilter<"Page"> | string | null
+  metaDescription?: Prisma.StringNullableWithAggregatesFilter<"Page"> | string | null
+  secondaryKeywords?: Prisma.StringNullableWithAggregatesFilter<"Page"> | string | null
+  seoTitle?: Prisma.StringNullableWithAggregatesFilter<"Page"> | string | null
+  menuLabel?: Prisma.StringNullableWithAggregatesFilter<"Page"> | string | null
+  contentBlocks?: Prisma.StringWithAggregatesFilter<"Page"> | string
 }
 
 export type PageCreateInput = {
   title: string
-  menuLabel?: string | null
   slug: string
   status?: string
-  content?: string
-  contentBlocks?: string
-  customHtml?: string
-  customCss?: string
-  customJs?: string
-  seoTitle?: string | null
-  metaDescription?: string | null
-  focusKeyword?: string | null
-  secondaryKeywords?: string | null
-  featuredImage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  content?: string
+  featuredImage?: string | null
+  customCss?: string
+  customHtml?: string
+  customJs?: string
+  focusKeyword?: string | null
+  metaDescription?: string | null
+  secondaryKeywords?: string | null
+  seoTitle?: string | null
+  menuLabel?: string | null
+  contentBlocks?: string
   menuItems?: Prisma.MenuItemCreateNestedManyWithoutPageInput
 }
 
 export type PageUncheckedCreateInput = {
   id?: number
   title: string
-  menuLabel?: string | null
   slug: string
   status?: string
-  content?: string
-  contentBlocks?: string
-  customHtml?: string
-  customCss?: string
-  customJs?: string
-  seoTitle?: string | null
-  metaDescription?: string | null
-  focusKeyword?: string | null
-  secondaryKeywords?: string | null
-  featuredImage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  content?: string
+  featuredImage?: string | null
+  customCss?: string
+  customHtml?: string
+  customJs?: string
+  focusKeyword?: string | null
+  metaDescription?: string | null
+  secondaryKeywords?: string | null
+  seoTitle?: string | null
+  menuLabel?: string | null
+  contentBlocks?: string
   menuItems?: Prisma.MenuItemUncheckedCreateNestedManyWithoutPageInput
 }
 
 export type PageUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  menuLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  content?: Prisma.StringFieldUpdateOperationsInput | string
-  contentBlocks?: Prisma.StringFieldUpdateOperationsInput | string
-  customHtml?: Prisma.StringFieldUpdateOperationsInput | string
-  customCss?: Prisma.StringFieldUpdateOperationsInput | string
-  customJs?: Prisma.StringFieldUpdateOperationsInput | string
-  seoTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  focusKeyword?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  secondaryKeywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  featuredImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  featuredImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customCss?: Prisma.StringFieldUpdateOperationsInput | string
+  customHtml?: Prisma.StringFieldUpdateOperationsInput | string
+  customJs?: Prisma.StringFieldUpdateOperationsInput | string
+  focusKeyword?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  secondaryKeywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  menuLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentBlocks?: Prisma.StringFieldUpdateOperationsInput | string
   menuItems?: Prisma.MenuItemUpdateManyWithoutPageNestedInput
 }
 
 export type PageUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  menuLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  content?: Prisma.StringFieldUpdateOperationsInput | string
-  contentBlocks?: Prisma.StringFieldUpdateOperationsInput | string
-  customHtml?: Prisma.StringFieldUpdateOperationsInput | string
-  customCss?: Prisma.StringFieldUpdateOperationsInput | string
-  customJs?: Prisma.StringFieldUpdateOperationsInput | string
-  seoTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  focusKeyword?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  secondaryKeywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  featuredImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  featuredImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customCss?: Prisma.StringFieldUpdateOperationsInput | string
+  customHtml?: Prisma.StringFieldUpdateOperationsInput | string
+  customJs?: Prisma.StringFieldUpdateOperationsInput | string
+  focusKeyword?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  secondaryKeywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  menuLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentBlocks?: Prisma.StringFieldUpdateOperationsInput | string
   menuItems?: Prisma.MenuItemUncheckedUpdateManyWithoutPageNestedInput
 }
 
 export type PageCreateManyInput = {
   id?: number
   title: string
-  menuLabel?: string | null
   slug: string
   status?: string
-  content?: string
-  contentBlocks?: string
-  customHtml?: string
-  customCss?: string
-  customJs?: string
-  seoTitle?: string | null
-  metaDescription?: string | null
-  focusKeyword?: string | null
-  secondaryKeywords?: string | null
-  featuredImage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  content?: string
+  featuredImage?: string | null
+  customCss?: string
+  customHtml?: string
+  customJs?: string
+  focusKeyword?: string | null
+  metaDescription?: string | null
+  secondaryKeywords?: string | null
+  seoTitle?: string | null
+  menuLabel?: string | null
+  contentBlocks?: string
 }
 
 export type PageUpdateManyMutationInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  menuLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  content?: Prisma.StringFieldUpdateOperationsInput | string
-  contentBlocks?: Prisma.StringFieldUpdateOperationsInput | string
-  customHtml?: Prisma.StringFieldUpdateOperationsInput | string
-  customCss?: Prisma.StringFieldUpdateOperationsInput | string
-  customJs?: Prisma.StringFieldUpdateOperationsInput | string
-  seoTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  focusKeyword?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  secondaryKeywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  featuredImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  featuredImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customCss?: Prisma.StringFieldUpdateOperationsInput | string
+  customHtml?: Prisma.StringFieldUpdateOperationsInput | string
+  customJs?: Prisma.StringFieldUpdateOperationsInput | string
+  focusKeyword?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  secondaryKeywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  menuLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentBlocks?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PageUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  menuLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  content?: Prisma.StringFieldUpdateOperationsInput | string
-  contentBlocks?: Prisma.StringFieldUpdateOperationsInput | string
-  customHtml?: Prisma.StringFieldUpdateOperationsInput | string
-  customCss?: Prisma.StringFieldUpdateOperationsInput | string
-  customJs?: Prisma.StringFieldUpdateOperationsInput | string
-  seoTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  focusKeyword?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  secondaryKeywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  featuredImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  featuredImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customCss?: Prisma.StringFieldUpdateOperationsInput | string
+  customHtml?: Prisma.StringFieldUpdateOperationsInput | string
+  customJs?: Prisma.StringFieldUpdateOperationsInput | string
+  focusKeyword?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  secondaryKeywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  menuLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentBlocks?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PageCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
-  menuLabel?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  content?: Prisma.SortOrder
-  contentBlocks?: Prisma.SortOrder
-  customHtml?: Prisma.SortOrder
-  customCss?: Prisma.SortOrder
-  customJs?: Prisma.SortOrder
-  seoTitle?: Prisma.SortOrder
-  metaDescription?: Prisma.SortOrder
-  focusKeyword?: Prisma.SortOrder
-  secondaryKeywords?: Prisma.SortOrder
-  featuredImage?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  content?: Prisma.SortOrder
+  featuredImage?: Prisma.SortOrder
+  customCss?: Prisma.SortOrder
+  customHtml?: Prisma.SortOrder
+  customJs?: Prisma.SortOrder
+  focusKeyword?: Prisma.SortOrder
+  metaDescription?: Prisma.SortOrder
+  secondaryKeywords?: Prisma.SortOrder
+  seoTitle?: Prisma.SortOrder
+  menuLabel?: Prisma.SortOrder
+  contentBlocks?: Prisma.SortOrder
 }
 
 export type PageAvgOrderByAggregateInput = {
@@ -576,41 +576,41 @@ export type PageAvgOrderByAggregateInput = {
 export type PageMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
-  menuLabel?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  content?: Prisma.SortOrder
-  contentBlocks?: Prisma.SortOrder
-  customHtml?: Prisma.SortOrder
-  customCss?: Prisma.SortOrder
-  customJs?: Prisma.SortOrder
-  seoTitle?: Prisma.SortOrder
-  metaDescription?: Prisma.SortOrder
-  focusKeyword?: Prisma.SortOrder
-  secondaryKeywords?: Prisma.SortOrder
-  featuredImage?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  content?: Prisma.SortOrder
+  featuredImage?: Prisma.SortOrder
+  customCss?: Prisma.SortOrder
+  customHtml?: Prisma.SortOrder
+  customJs?: Prisma.SortOrder
+  focusKeyword?: Prisma.SortOrder
+  metaDescription?: Prisma.SortOrder
+  secondaryKeywords?: Prisma.SortOrder
+  seoTitle?: Prisma.SortOrder
+  menuLabel?: Prisma.SortOrder
+  contentBlocks?: Prisma.SortOrder
 }
 
 export type PageMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
-  menuLabel?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  content?: Prisma.SortOrder
-  contentBlocks?: Prisma.SortOrder
-  customHtml?: Prisma.SortOrder
-  customCss?: Prisma.SortOrder
-  customJs?: Prisma.SortOrder
-  seoTitle?: Prisma.SortOrder
-  metaDescription?: Prisma.SortOrder
-  focusKeyword?: Prisma.SortOrder
-  secondaryKeywords?: Prisma.SortOrder
-  featuredImage?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  content?: Prisma.SortOrder
+  featuredImage?: Prisma.SortOrder
+  customCss?: Prisma.SortOrder
+  customHtml?: Prisma.SortOrder
+  customJs?: Prisma.SortOrder
+  focusKeyword?: Prisma.SortOrder
+  metaDescription?: Prisma.SortOrder
+  secondaryKeywords?: Prisma.SortOrder
+  seoTitle?: Prisma.SortOrder
+  menuLabel?: Prisma.SortOrder
+  contentBlocks?: Prisma.SortOrder
 }
 
 export type PageSumOrderByAggregateInput = {
@@ -626,12 +626,12 @@ export type StringFieldUpdateOperationsInput = {
   set?: string
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
 }
 
 export type IntFieldUpdateOperationsInput = {
@@ -660,41 +660,41 @@ export type PageUpdateOneWithoutMenuItemsNestedInput = {
 
 export type PageCreateWithoutMenuItemsInput = {
   title: string
-  menuLabel?: string | null
   slug: string
   status?: string
-  content?: string
-  contentBlocks?: string
-  customHtml?: string
-  customCss?: string
-  customJs?: string
-  seoTitle?: string | null
-  metaDescription?: string | null
-  focusKeyword?: string | null
-  secondaryKeywords?: string | null
-  featuredImage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  content?: string
+  featuredImage?: string | null
+  customCss?: string
+  customHtml?: string
+  customJs?: string
+  focusKeyword?: string | null
+  metaDescription?: string | null
+  secondaryKeywords?: string | null
+  seoTitle?: string | null
+  menuLabel?: string | null
+  contentBlocks?: string
 }
 
 export type PageUncheckedCreateWithoutMenuItemsInput = {
   id?: number
   title: string
-  menuLabel?: string | null
   slug: string
   status?: string
-  content?: string
-  contentBlocks?: string
-  customHtml?: string
-  customCss?: string
-  customJs?: string
-  seoTitle?: string | null
-  metaDescription?: string | null
-  focusKeyword?: string | null
-  secondaryKeywords?: string | null
-  featuredImage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  content?: string
+  featuredImage?: string | null
+  customCss?: string
+  customHtml?: string
+  customJs?: string
+  focusKeyword?: string | null
+  metaDescription?: string | null
+  secondaryKeywords?: string | null
+  seoTitle?: string | null
+  menuLabel?: string | null
+  contentBlocks?: string
 }
 
 export type PageCreateOrConnectWithoutMenuItemsInput = {
@@ -715,41 +715,41 @@ export type PageUpdateToOneWithWhereWithoutMenuItemsInput = {
 
 export type PageUpdateWithoutMenuItemsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  menuLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  content?: Prisma.StringFieldUpdateOperationsInput | string
-  contentBlocks?: Prisma.StringFieldUpdateOperationsInput | string
-  customHtml?: Prisma.StringFieldUpdateOperationsInput | string
-  customCss?: Prisma.StringFieldUpdateOperationsInput | string
-  customJs?: Prisma.StringFieldUpdateOperationsInput | string
-  seoTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  focusKeyword?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  secondaryKeywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  featuredImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  featuredImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customCss?: Prisma.StringFieldUpdateOperationsInput | string
+  customHtml?: Prisma.StringFieldUpdateOperationsInput | string
+  customJs?: Prisma.StringFieldUpdateOperationsInput | string
+  focusKeyword?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  secondaryKeywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  menuLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentBlocks?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PageUncheckedUpdateWithoutMenuItemsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  menuLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  content?: Prisma.StringFieldUpdateOperationsInput | string
-  contentBlocks?: Prisma.StringFieldUpdateOperationsInput | string
-  customHtml?: Prisma.StringFieldUpdateOperationsInput | string
-  customCss?: Prisma.StringFieldUpdateOperationsInput | string
-  customJs?: Prisma.StringFieldUpdateOperationsInput | string
-  seoTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  focusKeyword?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  secondaryKeywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  featuredImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  featuredImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customCss?: Prisma.StringFieldUpdateOperationsInput | string
+  customHtml?: Prisma.StringFieldUpdateOperationsInput | string
+  customJs?: Prisma.StringFieldUpdateOperationsInput | string
+  focusKeyword?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  secondaryKeywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  menuLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentBlocks?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 
@@ -786,21 +786,21 @@ export type PageCountOutputTypeCountMenuItemsArgs<ExtArgs extends runtime.Types.
 export type PageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   title?: boolean
-  menuLabel?: boolean
   slug?: boolean
   status?: boolean
-  content?: boolean
-  contentBlocks?: boolean
-  customHtml?: boolean
-  customCss?: boolean
-  customJs?: boolean
-  seoTitle?: boolean
-  metaDescription?: boolean
-  focusKeyword?: boolean
-  secondaryKeywords?: boolean
-  featuredImage?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  content?: boolean
+  featuredImage?: boolean
+  customCss?: boolean
+  customHtml?: boolean
+  customJs?: boolean
+  focusKeyword?: boolean
+  metaDescription?: boolean
+  secondaryKeywords?: boolean
+  seoTitle?: boolean
+  menuLabel?: boolean
+  contentBlocks?: boolean
   menuItems?: boolean | Prisma.Page$menuItemsArgs<ExtArgs>
   _count?: boolean | Prisma.PageCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["page"]>
@@ -808,64 +808,64 @@ export type PageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
 export type PageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   title?: boolean
-  menuLabel?: boolean
   slug?: boolean
   status?: boolean
-  content?: boolean
-  contentBlocks?: boolean
-  customHtml?: boolean
-  customCss?: boolean
-  customJs?: boolean
-  seoTitle?: boolean
-  metaDescription?: boolean
-  focusKeyword?: boolean
-  secondaryKeywords?: boolean
-  featuredImage?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  content?: boolean
+  featuredImage?: boolean
+  customCss?: boolean
+  customHtml?: boolean
+  customJs?: boolean
+  focusKeyword?: boolean
+  metaDescription?: boolean
+  secondaryKeywords?: boolean
+  seoTitle?: boolean
+  menuLabel?: boolean
+  contentBlocks?: boolean
 }, ExtArgs["result"]["page"]>
 
 export type PageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   title?: boolean
-  menuLabel?: boolean
   slug?: boolean
   status?: boolean
-  content?: boolean
-  contentBlocks?: boolean
-  customHtml?: boolean
-  customCss?: boolean
-  customJs?: boolean
-  seoTitle?: boolean
-  metaDescription?: boolean
-  focusKeyword?: boolean
-  secondaryKeywords?: boolean
-  featuredImage?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  content?: boolean
+  featuredImage?: boolean
+  customCss?: boolean
+  customHtml?: boolean
+  customJs?: boolean
+  focusKeyword?: boolean
+  metaDescription?: boolean
+  secondaryKeywords?: boolean
+  seoTitle?: boolean
+  menuLabel?: boolean
+  contentBlocks?: boolean
 }, ExtArgs["result"]["page"]>
 
 export type PageSelectScalar = {
   id?: boolean
   title?: boolean
-  menuLabel?: boolean
   slug?: boolean
   status?: boolean
-  content?: boolean
-  contentBlocks?: boolean
-  customHtml?: boolean
-  customCss?: boolean
-  customJs?: boolean
-  seoTitle?: boolean
-  metaDescription?: boolean
-  focusKeyword?: boolean
-  secondaryKeywords?: boolean
-  featuredImage?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  content?: boolean
+  featuredImage?: boolean
+  customCss?: boolean
+  customHtml?: boolean
+  customJs?: boolean
+  focusKeyword?: boolean
+  metaDescription?: boolean
+  secondaryKeywords?: boolean
+  seoTitle?: boolean
+  menuLabel?: boolean
+  contentBlocks?: boolean
 }
 
-export type PageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "menuLabel" | "slug" | "status" | "content" | "contentBlocks" | "customHtml" | "customCss" | "customJs" | "seoTitle" | "metaDescription" | "focusKeyword" | "secondaryKeywords" | "featuredImage" | "createdAt" | "updatedAt", ExtArgs["result"]["page"]>
+export type PageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "slug" | "status" | "createdAt" | "updatedAt" | "content" | "featuredImage" | "customCss" | "customHtml" | "customJs" | "focusKeyword" | "metaDescription" | "secondaryKeywords" | "seoTitle" | "menuLabel" | "contentBlocks", ExtArgs["result"]["page"]>
 export type PageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   menuItems?: boolean | Prisma.Page$menuItemsArgs<ExtArgs>
   _count?: boolean | Prisma.PageCountOutputTypeDefaultArgs<ExtArgs>
@@ -881,21 +881,21 @@ export type $PagePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     title: string
-    menuLabel: string | null
     slug: string
     status: string
-    content: string
-    contentBlocks: string
-    customHtml: string
-    customCss: string
-    customJs: string
-    seoTitle: string | null
-    metaDescription: string | null
-    focusKeyword: string | null
-    secondaryKeywords: string | null
-    featuredImage: string | null
     createdAt: Date
     updatedAt: Date
+    content: string
+    featuredImage: string | null
+    customCss: string
+    customHtml: string
+    customJs: string
+    focusKeyword: string | null
+    metaDescription: string | null
+    secondaryKeywords: string | null
+    seoTitle: string | null
+    menuLabel: string | null
+    contentBlocks: string
   }, ExtArgs["result"]["page"]>
   composites: {}
 }
@@ -1322,21 +1322,21 @@ export interface Prisma__PageClient<T, Null = never, ExtArgs extends runtime.Typ
 export interface PageFieldRefs {
   readonly id: Prisma.FieldRef<"Page", 'Int'>
   readonly title: Prisma.FieldRef<"Page", 'String'>
-  readonly menuLabel: Prisma.FieldRef<"Page", 'String'>
   readonly slug: Prisma.FieldRef<"Page", 'String'>
   readonly status: Prisma.FieldRef<"Page", 'String'>
-  readonly content: Prisma.FieldRef<"Page", 'String'>
-  readonly contentBlocks: Prisma.FieldRef<"Page", 'String'>
-  readonly customHtml: Prisma.FieldRef<"Page", 'String'>
-  readonly customCss: Prisma.FieldRef<"Page", 'String'>
-  readonly customJs: Prisma.FieldRef<"Page", 'String'>
-  readonly seoTitle: Prisma.FieldRef<"Page", 'String'>
-  readonly metaDescription: Prisma.FieldRef<"Page", 'String'>
-  readonly focusKeyword: Prisma.FieldRef<"Page", 'String'>
-  readonly secondaryKeywords: Prisma.FieldRef<"Page", 'String'>
-  readonly featuredImage: Prisma.FieldRef<"Page", 'String'>
   readonly createdAt: Prisma.FieldRef<"Page", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Page", 'DateTime'>
+  readonly content: Prisma.FieldRef<"Page", 'String'>
+  readonly featuredImage: Prisma.FieldRef<"Page", 'String'>
+  readonly customCss: Prisma.FieldRef<"Page", 'String'>
+  readonly customHtml: Prisma.FieldRef<"Page", 'String'>
+  readonly customJs: Prisma.FieldRef<"Page", 'String'>
+  readonly focusKeyword: Prisma.FieldRef<"Page", 'String'>
+  readonly metaDescription: Prisma.FieldRef<"Page", 'String'>
+  readonly secondaryKeywords: Prisma.FieldRef<"Page", 'String'>
+  readonly seoTitle: Prisma.FieldRef<"Page", 'String'>
+  readonly menuLabel: Prisma.FieldRef<"Page", 'String'>
+  readonly contentBlocks: Prisma.FieldRef<"Page", 'String'>
 }
     
 

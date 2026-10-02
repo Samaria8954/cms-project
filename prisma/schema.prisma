@@ -7,88 +7,51 @@ datasource db {
   provider = "postgresql"
 }
 
-
-// =====================================================
-// PAGE
-// =====================================================
-
 model Page {
-  id                 Int        @id @default(autoincrement())
-  title              String
-  menuLabel          String?
-  slug               String     @unique
-  status             String     @default("draft")
-
-  content            String     @default("")
-  contentBlocks      String     @default("[]")
-
-  customHtml         String     @default("")
-  customCss          String     @default("")
-  customJs           String     @default("")
-
-  seoTitle           String?
-  metaDescription    String?
-  focusKeyword       String?
-  secondaryKeywords  String?
-
-  featuredImage      String?
-
-  menuItems          MenuItem[]
-
-  createdAt          DateTime   @default(now())
-  updatedAt          DateTime   @updatedAt
+  id                Int        @id @default(autoincrement())
+  title             String
+  slug              String     @unique
+  status            String     @default("draft")
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  content           String     @default("")
+  featuredImage     String?
+  customCss         String     @default("")
+  customHtml        String     @default("")
+  customJs          String     @default("")
+  focusKeyword      String?
+  metaDescription   String?
+  secondaryKeywords String?
+  seoTitle          String?
+  menuLabel         String?
+  contentBlocks     String     @default("[]")
+  menuItems         MenuItem[]
 }
-// =====================================================
-// MENU
-// =====================================================
 
 model Menu {
-  id          Int        @id @default(autoincrement())
-  name        String     @unique
-  location    String?    @unique
-
-  items       MenuItem[]
-
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  location  String?    @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  items     MenuItem[]
 }
 
-
-// =====================================================
-// MENU ITEM
-// =====================================================
-
 model MenuItem {
-  id          Int        @id @default(autoincrement())
-
-  // Menu
-  menuId      Int
-  menu        Menu       @relation(fields: [menuId], references: [id], onDelete: Cascade)
-
-  // Basic information
-  title       String
-  type        String     @default("page")
-  url         String?
-
-  // Page relation
-  pageId      Int?
-  page        Page?      @relation(fields: [pageId], references: [id], onDelete: SetNull)
-
-  // Parent / Child menu hierarchy
-  parentId    Int?
-  parent      MenuItem?  @relation("MenuHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
-
-  children    MenuItem[] @relation("MenuHierarchy")
-
-  // Ordering
-  sortOrder   Int        @default(0)
-
-  // Status
-  status      String     @default("active")
-
-  // Mega menu
-  megaMenu    Boolean    @default(false)
-
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id        Int        @id @default(autoincrement())
+  title     String
+  type      String     @default("page")
+  url       String?
+  pageId    Int?
+  parentId  Int?
+  sortOrder Int        @default(0)
+  status    String     @default("active")
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  megaMenu  Boolean    @default(false)
+  menuId    Int
+  menu      Menu       @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  page      Page?      @relation(fields: [pageId], references: [id])
+  parent    MenuItem?  @relation("MenuHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children  MenuItem[] @relation("MenuHierarchy")
 }

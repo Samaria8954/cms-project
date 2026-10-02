@@ -75,21 +75,21 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 export const PageScalarFieldEnum = {
   id: 'id',
   title: 'title',
-  menuLabel: 'menuLabel',
   slug: 'slug',
   status: 'status',
-  content: 'content',
-  contentBlocks: 'contentBlocks',
-  customHtml: 'customHtml',
-  customCss: 'customCss',
-  customJs: 'customJs',
-  seoTitle: 'seoTitle',
-  metaDescription: 'metaDescription',
-  focusKeyword: 'focusKeyword',
-  secondaryKeywords: 'secondaryKeywords',
-  featuredImage: 'featuredImage',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  content: 'content',
+  featuredImage: 'featuredImage',
+  customCss: 'customCss',
+  customHtml: 'customHtml',
+  customJs: 'customJs',
+  focusKeyword: 'focusKeyword',
+  metaDescription: 'metaDescription',
+  secondaryKeywords: 'secondaryKeywords',
+  seoTitle: 'seoTitle',
+  menuLabel: 'menuLabel',
+  contentBlocks: 'contentBlocks'
 } as const
 
 export type PageScalarFieldEnum = (typeof PageScalarFieldEnum)[keyof typeof PageScalarFieldEnum]
@@ -108,7 +108,6 @@ export type MenuScalarFieldEnum = (typeof MenuScalarFieldEnum)[keyof typeof Menu
 
 export const MenuItemScalarFieldEnum = {
   id: 'id',
-  menuId: 'menuId',
   title: 'title',
   type: 'type',
   url: 'url',
@@ -116,9 +115,10 @@ export const MenuItemScalarFieldEnum = {
   parentId: 'parentId',
   sortOrder: 'sortOrder',
   status: 'status',
-  megaMenu: 'megaMenu',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  megaMenu: 'megaMenu',
+  menuId: 'menuId'
 } as const
 
 export type MenuItemScalarFieldEnum = (typeof MenuItemScalarFieldEnum)[keyof typeof MenuItemScalarFieldEnum]
