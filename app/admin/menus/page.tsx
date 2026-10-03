@@ -5,7 +5,6 @@ import {
   useEffect,
   useMemo,
   useState,
-  type ReactNode,
 } from "react";
 
 /* =========================================================
@@ -24,6 +23,14 @@ type Menu = {
   name: string;
   location: string | null;
 };
+
+type PendingMenuChange = {
+  id: number;
+  parentId: number | null;
+  sortOrder: number;
+};
+
+type TrashItem = MenuItem;
 
 type MenuItem = {
   id: number;
@@ -63,7 +70,8 @@ function Icon({
     | "location"
     | "external"
     | "home"
-    | "settings";
+    | "settings"
+    | "restore";
   size?: number;
 }) {
   const common = {
@@ -208,6 +216,15 @@ function Icon({
         </svg>
       );
 
+    case "restore":
+      return (
+        <svg {...common}>
+          <path d="M3 12a9 9 0 1 0 3-6.7" />
+          <path d="M3 4v6h6" />
+          <path d="M12 8v4l3 2" />
+        </svg>
+      );
+
     case "settings":
       return (
         <svg {...common}>
@@ -260,6 +277,22 @@ export default function MenusPage() {
   const [draggedItem, setDraggedItem] =
     useState<MenuItem | null>(null);
 
+  const [pendingChanges, setPendingChanges] =
+    useState<PendingMenuChange[]>([]);
+
+  const [pendingNewItems, setPendingNewItems] =
+    useState<MenuItem[]>([]);
+
+  const [trashItems, setTrashItems] = useState<TrashItem[]>([]);
+  const [pendingTrashIds, setPendingTrashIds] = useState<number[]>([]);
+  const [pendingPermanentDeleteIds, setPendingPermanentDeleteIds] = useState<number[]>([]);
+  const [trashOpen, setTrashOpen] = useState(false);
+
+  const [dropAction, setDropAction] = useState<{
+    dragged: MenuItem;
+    target: MenuItem;
+  } | null>(null);
+
   /* =======================================================
      NEW:
      OPEN/CLOSE PARENT MENUS
@@ -301,23 +334,18 @@ export default function MenusPage() {
           Array.isArray(data) ? data : [];
 
         setItems(loadedItems);
+        setPendingChanges([]);
+            setTrashItems([]);
+        setPendingTrashIds([]);
+        setPendingPermanentDeleteIds([]);
+        setTrashOpen(false);
 
         /* -----------------------------------------------
-           Parent menus default OPEN
+           All menu items start collapsed.
+           User can expand any parent manually.
         ------------------------------------------------ */
 
-        const parentIds = loadedItems
-          .filter((item) =>
-            loadedItems.some(
-              (child) =>
-                child.parentId === item.id
-            )
-          )
-          .map((item) => item.id);
-
-        setExpandedItems(
-          new Set(parentIds)
-        );
+        setExpandedItems(new Set());
       } catch (err) {
         console.error(
           "LOAD MENU ITEMS ERROR:",
@@ -641,113 +669,55 @@ export default function MenusPage() {
   };
 
   /* =======================================================
-     ADD SELECTED PAGES
+     ADD SELECTED PAGES — LOCAL DRAFT ONLY
   ======================================================= */
 
-  const addSelectedPages =
-    async () => {
-      if (!selectedMenuId) {
-        setError(
-          "Please select a menu."
-        );
-        return;
-      }
+  const addSelectedPages = () => {
+    if (!selectedMenuId) {
+      setError(
+        "Please select a menu."
+      );
+      return;
+    }
 
-      if (
-        selectedPageIds.length ===
-        0
-      ) {
-        setError(
-          "Please select at least one page."
-        );
-        return;
-      }
+    if (selectedPageIds.length === 0) {
+      setError(
+        "Please select at least one page."
+      );
+      return;
+    }
 
-      setSaving(true);
-      setError("");
-      setSuccess("");
+    const selectedPages = selectedPageIds
+      .map((pageId) => pages.find((page) => page.id === pageId))
+      .filter(Boolean) as Page[];
 
-      try {
-        let added = 0;
+    const startingSort =
+      items.length > 0
+        ? Math.max(...items.map((item) => item.sortOrder)) + 1
+        : 0;
 
-        for (const pageId of selectedPageIds) {
-          const page =
-            pages.find(
-              (item) =>
-                item.id === pageId
-            );
+    const draftItems = selectedPages.map((page, index) => ({
+      id: -(Date.now() + index + 1),
+      menuId: selectedMenuId,
+      title: page.title,
+      type: "page",
+      url: `/${page.slug}`,
+      pageId: page.id,
+      parentId: null,
+      sortOrder: startingSort + index,
+      status: "active",
+      megaMenu: false,
+      page,
+    }));
 
-          if (!page) continue;
-
-          const response =
-            await fetch(
-              "/api/menu-items",
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type":
-                    "application/json",
-                },
-                body: JSON.stringify({
-                  menuId:
-                    selectedMenuId,
-                  title:
-                    page.title,
-                  type: "page",
-                  url: `/${page.slug}`,
-                  pageId:
-                    page.id,
-                  parentId: null,
-                  sortOrder:
-                    items.length +
-                    added,
-                  status: "active",
-                  megaMenu: false,
-                }),
-              }
-            );
-
-          const data =
-            await response.json();
-
-          if (!response.ok) {
-            throw new Error(
-              data?.error ||
-                `Failed to add ${page.title}.`
-            );
-          }
-
-          added++;
-        }
-
-        setSelectedPageIds([]);
-
-        setSuccess(
-          `${added} page${
-            added === 1
-              ? ""
-              : "s"
-          } added successfully.`
-        );
-
-        await loadMenuItems(
-          selectedMenuId
-        );
-      } catch (err) {
-        console.error(
-          "ADD MENU ITEMS ERROR:",
-          err
-        );
-
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Failed to add pages."
-        );
-      } finally {
-        setSaving(false);
-      }
-    };
+    setItems((current) => [...current, ...draftItems]);
+    setPendingNewItems((current) => [...current, ...draftItems]);
+    setSelectedPageIds([]);
+    setSuccess(
+      `${draftItems.length} page${draftItems.length === 1 ? "" : "s"} added to the draft. Click Save Changes to persist them.`
+    );
+    setError("");
+  };
 
   /* =======================================================
      OPEN EDIT
@@ -765,178 +735,150 @@ export default function MenusPage() {
   };
 
   /* =======================================================
-     SAVE ITEM
+     SAVE ITEM — LOCAL DRAFT ONLY
   ======================================================= */
 
-  const saveItem = async () => {
-    if (
-      !selectedMenuId ||
-      !editingItem
-    ) {
+  const saveItem = () => {
+    if (!editingItem) {
       return;
     }
 
-    const title =
-      editingItem.title.trim();
+    const title = editingItem.title.trim();
 
     if (!title) {
-      setError(
-        "Title is required."
-      );
+      setError("Title is required.");
       return;
     }
 
-    setSaving(true);
-    setError("");
-    setSuccess("");
+    const updatedItem: MenuItem = {
+      ...editingItem,
+      title,
+      url: editingItem.url?.trim() || null,
+    };
 
-    try {
-      const response =
-        await fetch(
-          `/api/menus/${selectedMenuId}/items/${editingItem.id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-            body: JSON.stringify({
-              title,
-              url:
-                editingItem.url?.trim() ||
-                null,
-              pageId:
-                editingItem.pageId,
-              parentId:
-                editingItem.parentId,
-              sortOrder:
-                editingItem.sortOrder,
-              status:
-                editingItem.status,
-              megaMenu:
-                editingItem.megaMenu,
-            }),
-          }
-        );
+    setItems((current) =>
+      current.map((item) =>
+        item.id === updatedItem.id ? updatedItem : item
+      )
+    );
 
-      const data =
-        await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data?.error ||
-            "Failed to update menu item."
-        );
-      }
-
-      setEditingItem(null);
-
-      await loadMenuItems(
-        selectedMenuId
+    if (updatedItem.id < 0) {
+      setPendingNewItems((current) =>
+        current.map((item) =>
+          item.id === updatedItem.id ? updatedItem : item
+        )
       );
+    } else {
+      setPendingChanges((current) => {
+        const existing = current.find((change) => change.id === updatedItem.id);
+        const change = {
+          id: updatedItem.id,
+          parentId: updatedItem.parentId,
+          sortOrder: updatedItem.sortOrder,
+        };
 
-      setSuccess(
-        "Menu item updated successfully."
-      );
-    } catch (err) {
-      console.error(
-        "UPDATE MENU ITEM ERROR:",
-        err
-      );
-
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to update menu item."
-      );
-    } finally {
-      setSaving(false);
+        return existing
+          ? current.map((item) => item.id === updatedItem.id ? change : item)
+          : [...current, change];
+      });
     }
+
+    setEditingItem(null);
+    setError("");
+    setSuccess(
+      `"${updatedItem.title}" updated in the draft. Click Save Changes to persist it.`
+    );
   };
 
   /* =======================================================
-     DELETE ITEM
+     MOVE ITEM TO TRASH — LOCAL ONLY
   ======================================================= */
 
-  const deleteItem = async (
-    itemId: number
-  ) => {
-    if (!selectedMenuId) {
-      setError(
-        "Please select a menu."
-      );
-      return;
-    }
+  const deleteItem = (itemId: number) => {
+    const item = items.find((x) => x.id === itemId);
+    if (!item) return;
 
-    const item =
-      items.find(
-        (menuItem) =>
-          menuItem.id === itemId
-      );
+    const subtree: MenuItem[] = [];
+    const collect = (id: number) => {
+      const current = items.find((x) => x.id === id);
+      if (!current) return;
+      subtree.push(current);
+      items.filter((x) => x.parentId === id).forEach((x) => collect(x.id));
+    };
+    collect(itemId);
 
-    const confirmed =
-      window.confirm(
-        `Are you sure you want to delete "${item?.title || "this menu item"}"?`
-      );
-
+    const confirmed = window.confirm(
+      subtree.length > 1
+        ? `Move "${item.title}" and its ${subtree.length - 1} child item(s) to Trash?`
+        : `Move "${item.title}" to Trash?`
+    );
     if (!confirmed) return;
 
-    setSaving(true);
-    setError("");
-    setSuccess("");
-
-    try {
-      const response =
-        await fetch(
-          `/api/menus/${selectedMenuId}/items/${itemId}`,
-          {
-            method: "DELETE",
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-          }
-        );
-
-      const data =
-        await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data?.error ||
-            "Failed to delete menu item."
-        );
-      }
-
-      if (
-        editingItem?.id ===
-        itemId
-      ) {
-        setEditingItem(null);
-      }
-
-      await loadMenuItems(
-        selectedMenuId
+    const ids = new Set(subtree.map((x) => x.id));
+    setItems((current) => current.filter((x) => !ids.has(x.id)));
+    setTrashItems((current) => [
+      ...current.filter((x) => !ids.has(x.id)),
+      ...subtree,
+    ]);
+    if (item.id > 0) {
+      setPendingTrashIds((current) =>
+        current.includes(item.id) ? current : [...current, item.id]
       );
-
-      setSuccess(
-        data?.message ||
-          "Menu item deleted successfully."
-      );
-    } catch (err) {
-      console.error(
-        "DELETE MENU ITEM ERROR:",
-        err
-      );
-
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to delete menu item."
-      );
-    } finally {
-      setSaving(false);
     }
+    setExpandedItems((current) => {
+      const next = new Set(current);
+      ids.forEach((id) => next.delete(id));
+      return next;
+    });
+    setSuccess("Item moved to Trash in the draft. Click Save Changes to persist it.");
+  };
+
+  const restoreTrashItem = (itemId: number) => {
+    const item = trashItems.find((x) => x.id === itemId);
+    if (!item) return;
+
+    const subtree: TrashItem[] = [];
+    const collect = (id: number) => {
+      const current = trashItems.find((x) => x.id === id);
+      if (!current) return;
+      subtree.push(current);
+      trashItems.filter((x) => x.parentId === id).forEach((x) => collect(x.id));
+    };
+    collect(itemId);
+
+    const ids = new Set(subtree.map((x) => x.id));
+    setTrashItems((current) => current.filter((x) => !ids.has(x.id)));
+    setItems((current) => [
+      ...current,
+      ...subtree,
+    ]);
+    setPendingTrashIds((current) => current.filter((id) => !ids.has(id)));
+    setPendingPermanentDeleteIds((current) => current.filter((id) => !ids.has(id)));
+    setSuccess("Item restored in the draft. Click Save Changes to persist it.");
+  };
+
+  const permanentlyDeleteTrashItem = (itemId: number) => {
+    const item = trashItems.find((x) => x.id === itemId);
+    if (!item) return;
+    if (!window.confirm(`Permanently delete "${item.title}"? This cannot be undone.`)) return;
+
+    const ids = new Set<number>();
+    const collect = (id: number) => {
+      ids.add(id);
+      trashItems.filter((x) => x.parentId === id).forEach((x) => collect(x.id));
+    };
+    collect(itemId);
+
+    setTrashItems((current) => current.filter((x) => !ids.has(x.id)));
+    setPendingTrashIds((current) => current.filter((id) => !ids.has(id)));
+    setPendingPermanentDeleteIds((current) => {
+      const next = current.filter((id) => !ids.has(id));
+      ids.forEach((id) => {
+        if (id > 0 && !next.includes(id)) next.push(id);
+      });
+      return next;
+    });
+    setSuccess("Item removed from Trash in the draft. Save Changes to persist it.");
   };
 
   /* =======================================================
@@ -944,69 +886,14 @@ export default function MenusPage() {
   ======================================================= */
 
   const updateMenu = async () => {
-    if (!selectedMenuId)
-      return;
+    if (!selectedMenuId) return;
 
     if (!menuName.trim()) {
-      setError(
-        "Menu name is required."
-      );
+      setError("Menu name is required.");
       return;
     }
 
-    setSaving(true);
-    setError("");
-    setSuccess("");
-
-    try {
-      const response =
-        await fetch(
-          `/api/menus/${selectedMenuId}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-            body: JSON.stringify({
-              name:
-                menuName.trim(),
-              location:
-                menuLocation.trim() ||
-                null,
-            }),
-          }
-        );
-
-      const data =
-        await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data?.error ||
-            "Failed to update menu."
-        );
-      }
-
-      setSuccess(
-        "Menu updated successfully."
-      );
-
-      await loadMenus();
-    } catch (err) {
-      console.error(
-        "UPDATE MENU ERROR:",
-        err
-      );
-
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to update menu."
-      );
-    } finally {
-      setSaving(false);
-    }
+    await saveMenuStructureChanges();
   };
 
   /* =======================================================
@@ -1017,6 +904,7 @@ export default function MenusPage() {
     item: MenuItem
   ) => {
     setDraggedItem(item);
+    setError("");
   };
 
   /* =======================================================
@@ -1028,20 +916,69 @@ export default function MenusPage() {
   };
 
   /* =======================================================
-     DROP ITEM
+     APPLY LOCAL STRUCTURE CHANGE
+     UI changes immediately; DB is NOT touched here.
   ======================================================= */
 
-  const moveItem = async (
+  const applyLocalChange = (
+    id: number,
+    parentId: number | null,
+    sortOrder: number
+  ) => {
+    setItems((current) =>
+      current.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              parentId,
+              sortOrder,
+            }
+          : item
+      )
+    );
+
+    setPendingChanges((current) => {
+      const existing = current.find(
+        (change) => change.id === id
+      );
+
+      if (existing) {
+        return current.map((change) =>
+          change.id === id
+            ? {
+                ...change,
+                parentId,
+                sortOrder,
+              }
+            : change
+        );
+      }
+
+      return [
+        ...current,
+        {
+          id,
+          parentId,
+          sortOrder,
+        },
+      ];
+    });
+  };
+
+  /* =======================================================
+     DROP ITEM
+     Opens placement dialog only.
+  ======================================================= */
+
+  const moveItem = (
     dragged: MenuItem,
     target: MenuItem
   ) => {
-    if (!selectedMenuId)
+    if (!selectedMenuId) {
       return;
+    }
 
-    if (
-      dragged.id ===
-      target.id
-    ) {
+    if (dragged.id === target.id) {
       return;
     }
 
@@ -1055,85 +992,239 @@ export default function MenusPage() {
       setError(
         "An item cannot be placed inside its own child."
       );
-
       setDraggedItem(null);
       return;
     }
+
+    setError("");
+    setSuccess("");
+
+    setDropAction({
+      dragged,
+      target,
+    });
+
+    setDraggedItem(null);
+  };
+
+  /* =======================================================
+     MAKE CHILD
+     LOCAL UI ONLY
+  ======================================================= */
+
+  const makeChild = (
+    dragged: MenuItem,
+    target: MenuItem
+  ) => {
+    if (
+      isDescendant(
+        target.id,
+        dragged.id,
+        items
+      )
+    ) {
+      setError(
+        "An item cannot be placed inside its own child."
+      );
+      setDropAction(null);
+      return;
+    }
+
+    const children = items.filter(
+      (item) =>
+        item.parentId === target.id &&
+        item.id !== dragged.id
+    );
+
+    const nextSortOrder =
+      children.length > 0
+        ? Math.max(
+            ...children.map(
+              (item) => item.sortOrder
+            )
+          ) + 1
+        : 0;
+
+    applyLocalChange(
+      dragged.id,
+      target.id,
+      nextSortOrder
+    );
+
+    setExpandedItems((current) => {
+      const next = new Set(current);
+      next.add(target.id);
+      return next;
+    });
+
+    setDropAction(null);
+
+    setSuccess(
+      `"${dragged.title}" placed inside "${target.title}". Click Save Changes to save it.`
+    );
+  };
+
+  /* =======================================================
+     SWAP POSITION
+     LOCAL UI ONLY
+  ======================================================= */
+
+  const swapPosition = (
+    dragged: MenuItem,
+    target: MenuItem
+  ) => {
+    applyLocalChange(
+      dragged.id,
+      target.parentId,
+      target.sortOrder
+    );
+
+    applyLocalChange(
+      target.id,
+      dragged.parentId,
+      dragged.sortOrder
+    );
+
+    setDropAction(null);
+
+    setSuccess(
+      `"${dragged.title}" and "${target.title}" positions swapped. Click Save Changes to save it.`
+    );
+  };
+
+  /* =======================================================
+     MAKE TOP LEVEL
+     LOCAL UI ONLY
+  ======================================================= */
+
+  const makeTopLevel = (
+    item: MenuItem
+  ) => {
+    const topLevelItems = items.filter(
+      (currentItem) =>
+        currentItem.parentId === null &&
+        currentItem.id !== item.id
+    );
+
+    const nextSortOrder =
+      topLevelItems.length > 0
+        ? Math.max(
+            ...topLevelItems.map(
+              (currentItem) =>
+                currentItem.sortOrder
+            )
+          ) + 1
+        : 0;
+
+    applyLocalChange(
+      item.id,
+      null,
+      nextSortOrder
+    );
+
+    setSuccess(
+      `"${item.title}" moved to top level. Click Save Changes to save it.`
+    );
+  };
+
+  /* =======================================================
+     SAVE STRUCTURE CHANGES TO DATABASE
+  ======================================================= */
+
+  const saveMenuStructureChanges = async () => {
+    if (!selectedMenuId) return;
 
     setSaving(true);
     setError("");
     setSuccess("");
 
     try {
-      const response =
-        await fetch(
-          `/api/menus/${selectedMenuId}/items/${dragged.id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type":
-                "application/json",
+      // One request persists the entire draft: menu settings, new items,
+      // structure edits, soft deletes, and permanent deletes.
+      const response = await fetch(
+        `/api/menus/${selectedMenuId}/items/bulk`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            menu: {
+              name: menuName.trim(),
+              location: menuLocation.trim() || null,
             },
-            body: JSON.stringify({
-              title:
-                dragged.title,
-              url:
-                dragged.url,
-              pageId:
-                dragged.pageId,
-              parentId:
-                target.id,
-              sortOrder: 0,
-              status:
-                dragged.status,
-              megaMenu:
-                dragged.megaMenu,
-            }),
-          }
-        );
 
-      const data =
-        await response.json();
+            // Use the current draft items rather than the original
+            // pendingNewItems array so drag/drop and edits made to new
+            // items are also included.
+            newItems: items
+              .filter((item) => item.id < 0)
+              .map((item) => ({
+                clientId: item.id,
+                title: item.title,
+                type: item.type,
+                url: item.url,
+                pageId: item.pageId,
+                parentId: item.parentId,
+                sortOrder: item.sortOrder,
+                status: item.status,
+                megaMenu: item.megaMenu,
+              })),
 
-      if (!response.ok) {
-        throw new Error(
-          data?.error ||
-            "Failed to move item."
-        );
-      }
+            changes: pendingChanges
+              .filter((change) => change.id > 0)
+              .map((change) => {
+                const item = items.find(
+                  (currentItem) => currentItem.id === change.id
+                );
 
-      /*
-       * Automatically open target parent
-       * after an item is dropped inside it.
-       */
-      setExpandedItems(
-        (current) => {
-          const next =
-            new Set(current);
+                return {
+                  id: change.id,
+                  title: item?.title,
+                  url: item?.url,
+                  pageId: item?.pageId,
+                  parentId: change.parentId,
+                  sortOrder: change.sortOrder,
+                  status: item?.status,
+                  megaMenu: item?.megaMenu,
+                };
+              }),
 
-          next.add(target.id);
-
-          return next;
+            trashIds: pendingTrashIds.filter((id) => id > 0),
+            permanentDeleteIds: pendingPermanentDeleteIds.filter(
+              (id) => id > 0
+            ),
+          }),
         }
       );
 
-      setSuccess(
-        `"${dragged.title}" moved under "${target.title}".`
-      );
+      const data = await response.json();
 
-      await loadMenuItems(
-        selectedMenuId
+      if (!response.ok) {
+        throw new Error(
+          data?.error || "Failed to save menu changes."
+        );
+      }
+
+      setPendingChanges([]);
+        setPendingTrashIds([]);
+      setPendingPermanentDeleteIds([]);
+      setTrashItems([]);
+      setDropAction(null);
+
+      // Refresh once after the single bulk transaction completes.
+      await loadMenuItems(selectedMenuId);
+
+      setSuccess(
+        "Menu changes saved successfully."
       );
     } catch (err) {
-      console.error(
-        "MOVE ITEM ERROR:",
-        err
-      );
+      console.error("SAVE MENU STRUCTURE ERROR:", err);
 
       setError(
         err instanceof Error
           ? err.message
-          : "Failed to move item."
+          : "Failed to save menu changes."
       );
     } finally {
       setSaving(false);
@@ -1142,76 +1233,48 @@ export default function MenusPage() {
   };
 
   /* =======================================================
-     MAKE TOP LEVEL
+     DISCARD STRUCTURE CHANGES
   ======================================================= */
 
-  const makeTopLevel = async (
-    item: MenuItem
-  ) => {
-    if (!selectedMenuId)
-      return;
-
-    setSaving(true);
-    setError("");
-    setSuccess("");
-
-    try {
-      const response =
-        await fetch(
-          `/api/menus/${selectedMenuId}/items/${item.id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-            body: JSON.stringify({
-              title: item.title,
-              url: item.url,
-              pageId: item.pageId,
-              parentId: null,
-              sortOrder:
-                items.length,
-              status: item.status,
-              megaMenu:
-                item.megaMenu,
-            }),
-          }
-        );
-
-      const data =
-        await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data?.error ||
-            "Failed to move item."
-        );
+  const discardMenuStructureChanges =
+    async () => {
+      if (!selectedMenuId) {
+        return;
       }
 
-      setSuccess(
-        `"${item.title}" moved to top level.`
+      const confirmed = window.confirm(
+        "Discard all unsaved menu structure changes?"
       );
+
+      if (!confirmed) {
+        return;
+      }
+
+      setSaving(true);
+      setError("");
+      setSuccess("");
+      setDropAction(null);
+      setPendingChanges([]);
+        setPendingTrashIds([]);
+      setPendingPermanentDeleteIds([]);
+      setTrashItems([]);
+
+      const selectedMenu = menus.find(
+        (menu) => menu.id === selectedMenuId
+      );
+
+      setMenuName(selectedMenu?.name || "");
+      setMenuLocation(selectedMenu?.location || "");
 
       await loadMenuItems(
         selectedMenuId
       );
-    } catch (err) {
-      console.error(
-        "TOP LEVEL ERROR:",
-        err
-      );
 
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to move item."
-      );
-    } finally {
       setSaving(false);
-      setDraggedItem(null);
-    }
-  };
+      setSuccess(
+        "Unsaved menu structure changes discarded."
+      );
+    };
 
   /* =======================================================
      LOADING
@@ -1603,23 +1666,57 @@ export default function MenusPage() {
                   </div>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={
-                    updateMenu
-                  }
-                  disabled={saving}
-                  className={`${buttonPrimary} menu-shine md:px-6`}
-                >
-                  <Icon
-                    name="save"
-                    size={16}
-                  />
+                <div className="flex items-center justify-end gap-2 whitespace-nowrap md:gap-2">
 
-                  {saving
-                    ? "Saving..."
-                    : "Save Changes"}
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => setTrashOpen((v) => !v)}
+                    disabled={saving}
+                    className={`inline-flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-xl border px-3 text-[12px] font-semibold transition ${
+                      trashOpen
+                        ? "border-red-200 bg-red-50 text-red-600"
+                        : "border-slate-200 bg-white text-slate-500 hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+                    } disabled:cursor-not-allowed disabled:opacity-50`}
+                  >
+                    <Icon name="trash" size={14} />
+                    Trash
+                    {trashItems.length > 0 && (
+                      <span className="rounded-full bg-red-100 px-1.5 py-0.5 text-[9px] font-bold text-red-600">
+                        {trashItems.length}
+                      </span>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={
+                      discardMenuStructureChanges
+                    }
+                    disabled={saving}
+                    className="inline-flex h-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white px-3.5 text-[12px] font-semibold text-slate-600 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Discard
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={
+                      updateMenu
+                    }
+                    disabled={saving}
+                    className={`${buttonPrimary} menu-shine inline-flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-xl px-4 text-[12px] font-semibold`}
+                  >
+                    <Icon
+                      name="save"
+                      size={14}
+                    />
+
+                    {saving
+                      ? "Saving..."
+                      : "Save Changes"}
+                  </button>
+
+                </div>
 
               </div>
             </section>
@@ -1928,6 +2025,15 @@ export default function MenusPage() {
 
                 </div>
 
+                {trashOpen && (
+                  <TrashPanel
+                    items={trashItems}
+                    onRestore={restoreTrashItem}
+                    onPermanentDelete={permanentlyDeleteTrashItem}
+                    onClose={() => setTrashOpen(false)}
+                  />
+                )}
+
                 <div className="p-5">
 
                   {/* TOP LEVEL DROP */}
@@ -2044,6 +2150,32 @@ export default function MenusPage() {
         )}
 
         {/* =================================================
+            DROP ACTION MODAL
+        ================================================= */}
+
+        {dropAction && (
+          <DropActionModal
+            dragged={dropAction.dragged}
+            target={dropAction.target}
+            onMakeChild={() =>
+              makeChild(
+                dropAction.dragged,
+                dropAction.target
+              )
+            }
+            onSwap={() =>
+              swapPosition(
+                dropAction.dragged,
+                dropAction.target
+              )
+            }
+            onClose={() =>
+              setDropAction(null)
+            }
+          />
+        )}
+
+        {/* =================================================
             EDIT MODAL
         ================================================= */}
 
@@ -2144,32 +2276,28 @@ function MenuItemRow({
 
       <div
         draggable
-        onDragStart={() =>
-          onDragStart(item)
-        }
-        onDragEnd={
-          onDragEnd
-        }
-        onDragOver={(e) =>
-          e.preventDefault()
-        }
-        onDrop={(e) => {
-          e.stopPropagation();
-
-          if (
-            draggedItem &&
-            draggedItem.id !==
-              item.id
-          ) {
-            onDrop(
-              draggedItem,
-              item
-            );
-          }
+        onDragStart={(e) => {
+          e.dataTransfer.effectAllowed = "move";
+          e.dataTransfer.setData("text/plain", String(item.id));
+          onDragStart(item);
         }}
-        className={`group flex min-h-[72px] items-center gap-3 rounded-xl border bg-white px-3.5 py-3 transition-all duration-250 ${
+        onDragEnd={onDragEnd}
+        onDragOver={(e) => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = "move";
+        }}
+        onDrop={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const id = Number(e.dataTransfer.getData("text/plain"));
+          const dragged = draggedItem?.id === id
+            ? draggedItem
+            : items.find((x) => x.id === id);
+          if (dragged && dragged.id !== item.id) onDrop(dragged, item);
+        }}
+        className={`group flex min-h-[72px] w-full min-w-0 flex-wrap items-center gap-2.5 rounded-xl border bg-white px-3 py-3 transition-all duration-200 ${
           isDragging
-            ? "scale-[0.98] border-blue-300 bg-blue-50/60 opacity-40"
+            ? "scale-[0.98] border-blue-400 bg-blue-50/70 opacity-50 shadow-lg"
             : "border-slate-200 hover:-translate-y-0.5 hover:border-blue-200 hover:bg-gradient-to-r hover:from-white hover:to-blue-50/40 hover:shadow-lg hover:shadow-blue-500/5"
         }`}
       >
@@ -2266,59 +2394,44 @@ function MenuItemRow({
             CONTENT
         ================================================= */}
 
-        <div className="min-w-0 flex-1">
+        <div className="flex min-w-0 flex-1 items-center gap-2">
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
 
-            <span className="truncate text-[14px] font-bold text-slate-800 transition-colors group-hover:text-blue-700">
+            <span className="min-w-0 break-words text-[14px] font-bold leading-5 text-slate-800 transition-colors group-hover:text-blue-700">
               {item.title}
             </span>
 
-            <span className="rounded-full bg-slate-100 px-2 py-1 text-[10px] font-semibold capitalize text-slate-500">
+            <span className="shrink-0 rounded-full bg-slate-100 px-2 py-1 text-[10px] font-semibold capitalize text-slate-500">
               {item.type}
             </span>
 
             {hasChildren && (
-              <span className="rounded-full bg-blue-50 px-2 py-1 text-[10px] font-bold text-blue-600">
+              <span className="shrink-0 rounded-full bg-blue-50 px-2 py-1 text-[10px] font-bold text-blue-600">
                 {children.length}{" "}
-                {children.length ===
-                1
-                  ? "child"
-                  : "children"}
+                {children.length === 1 ? "child" : "children"}
               </span>
             )}
 
             {item.megaMenu && (
-              <span className="rounded-full bg-gradient-to-r from-violet-50 to-fuchsia-50 px-2 py-1 text-[10px] font-bold text-violet-600">
+              <span className="shrink-0 rounded-full bg-gradient-to-r from-violet-50 to-fuchsia-50 px-2 py-1 text-[10px] font-bold text-violet-600">
                 Mega Menu
               </span>
             )}
 
             <span
-              className={`rounded-full px-2 py-1 text-[10px] font-bold ${
-                item.status ===
-                "active"
+              className={`shrink-0 rounded-full px-2 py-1 text-[10px] font-bold ${
+                item.status === "active"
                   ? "bg-emerald-50 text-emerald-600"
                   : "bg-slate-100 text-slate-400"
               }`}
             >
-              {item.status ===
-              "active"
-                ? "Active"
-                : "Inactive"}
+              {item.status === "active" ? "Active" : "Inactive"}
             </span>
 
-          </div>
-
-          <div className="mt-1.5 flex min-w-0 items-center gap-1.5 text-[11px] text-slate-400">
-
-            <Icon
-              name="link"
-              size={11}
-            />
-
-            <span className="truncate">
-              {item.url || "#"}
+            <span className="flex min-w-0 max-w-full items-center gap-1.5 break-all text-[11px] text-slate-400">
+              <Icon name="link" size={11} />
+              <span className="break-all">{item.url || "#"}</span>
             </span>
 
           </div>
@@ -2833,4 +2946,228 @@ function isDescendant(
   }
 
   return false;
+}
+
+/* =========================================================
+   TRASH PANEL
+========================================================= */
+
+function TrashPanel({
+  items,
+  onRestore,
+  onPermanentDelete,
+  onClose,
+}: {
+  items: TrashItem[];
+  onRestore: (id: number) => void;
+  onPermanentDelete: (id: number) => void;
+  onClose: () => void;
+}) {
+  return (
+    <div className="border-b border-slate-100 bg-gradient-to-br from-red-50/70 via-white to-rose-50/40 px-5 py-4">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-100 text-red-600">
+            <Icon name="trash" size={17} />
+          </div>
+          <div>
+            <h3 className="text-[13px] font-bold text-slate-800">Trash</h3>
+            <p className="text-[10px] text-slate-500">Deleted items stay here until you restore or permanently remove them.</p>
+          </div>
+        </div>
+        <button type="button" onClick={onClose} className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-white hover:text-slate-700">
+          <Icon name="close" size={15} />
+        </button>
+      </div>
+
+      {!items.length ? (
+        <div className="mt-3 rounded-xl border border-dashed border-red-200 bg-white/70 px-4 py-6 text-center text-[11px] text-slate-400">
+          Trash is empty.
+        </div>
+      ) : (
+        <div className="mt-3 grid gap-2">
+          {items.map((item) => (
+            <div key={item.id} className="flex items-center gap-3 rounded-xl border border-red-100 bg-white px-3 py-2.5 shadow-sm">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-500">
+                <Icon name="trash" size={14} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-[12px] font-semibold text-slate-700">{item.title}</div>
+                <div className="mt-0.5 text-[9px] text-slate-400">{item.type} • {item.url || "Menu item"}</div>
+              </div>
+              <div className="flex shrink-0 items-center gap-1.5">
+                <button type="button" onClick={() => onRestore(item.id)} className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 text-[10px] font-bold text-emerald-600 hover:bg-emerald-100">
+                  <Icon name="restore" size={13} /> Restore
+                </button>
+                <button type="button" onClick={() => onPermanentDelete(item.id)} className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-2.5 text-[10px] font-bold text-red-600 hover:bg-red-100">
+                  <Icon name="trash" size={13} /> Delete Permanently
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* =========================================================
+   DROP ACTION MODAL
+========================================================= */
+
+function DropActionModal({
+  dragged,
+  target,
+  onMakeChild,
+  onSwap,
+  onClose,
+}: {
+  dragged: MenuItem;
+  target: MenuItem;
+  onMakeChild: () => void;
+  onSwap: () => void;
+  onClose: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/55 p-4 backdrop-blur-sm">
+      <div className="menu-modal w-full max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+        <div className="relative border-b border-slate-100 px-6 py-5">
+          <div className="absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600" />
+
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <div className="mb-1 flex items-center gap-2">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white">
+                  <Icon name="layers" size={17} />
+                </div>
+
+                <h2 className="text-lg font-bold text-slate-800">
+                  Place Menu Item
+                </h2>
+              </div>
+
+              <p className="mt-2 text-[12px] leading-5 text-slate-500">
+                Choose how you want to place the dragged item.
+                The change will appear in the menu immediately,
+                but the database will only be updated after
+                you click Save Changes.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+            >
+              <Icon name="close" size={18} />
+            </button>
+          </div>
+        </div>
+
+        <div className="space-y-3 p-6">
+          <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-3.5">
+            <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.1em] text-blue-500">
+              Dragged Item
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-white">
+                <Icon name="menu" size={16} />
+              </div>
+
+              <div className="min-w-0">
+                <div className="truncate text-[14px] font-semibold text-slate-800">
+                  {dragged.title}
+                </div>
+                <div className="mt-0.5 truncate text-[11px] text-slate-400">
+                  {dragged.url || "Menu item"}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-center text-slate-300">
+            <span className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 bg-white">
+              ↓
+            </span>
+          </div>
+
+          <div className="rounded-xl border border-violet-100 bg-violet-50/60 p-3.5">
+            <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.1em] text-violet-500">
+              Dropped On
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white">
+                <Icon name="layers" size={16} />
+              </div>
+
+              <div className="min-w-0">
+                <div className="truncate text-[14px] font-semibold text-slate-800">
+                  {target.title}
+                </div>
+                <div className="mt-0.5 truncate text-[11px] text-slate-400">
+                  {target.url || "Menu item"}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-3 pt-2 sm:grid-cols-2">
+            <button
+              type="button"
+              onClick={onMakeChild}
+              className="group rounded-xl border border-blue-200 bg-blue-50/50 p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-400 hover:bg-blue-50 hover:shadow-lg"
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white">
+                  <Icon name="chevron" size={18} />
+                </div>
+
+                <div>
+                  <div className="text-[13px] font-bold text-slate-800">
+                    Make Child
+                  </div>
+                  <div className="mt-0.5 text-[10px] leading-4 text-slate-500">
+                    Put the dragged item inside the target.
+                  </div>
+                </div>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={onSwap}
+              className="group rounded-xl border border-violet-200 bg-violet-50/50 p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-violet-400 hover:bg-violet-50 hover:shadow-lg"
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-600 text-white">
+                  <Icon name="layers" size={18} />
+                </div>
+
+                <div>
+                  <div className="text-[13px] font-bold text-slate-800">
+                    Swap Position
+                  </div>
+                  <div className="mt-0.5 text-[10px] leading-4 text-slate-500">
+                    Exchange their current positions.
+                  </div>
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <div className="border-t border-slate-100 bg-slate-50/70 px-6 py-4">
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-[13px] font-semibold text-slate-600 transition hover:bg-slate-100"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }

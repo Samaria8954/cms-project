@@ -118,6 +118,7 @@ export const MenuItemScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   megaMenu: 'megaMenu',
+  deletedAt: 'deletedAt',
   menuId: 'menuId'
 } as const
 
